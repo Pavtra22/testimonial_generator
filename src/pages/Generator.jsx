@@ -16,21 +16,31 @@ export default function Generator({ onSave, navigateToSaved }) {
   const [template, setTemplate] = useState('gradient'); // Can be 'classic', 'dark', 'gradient' or a base64 image string
   const [size, setSize] = useState({ w: 1080, h: 1080, unit: 'px', locked: true });
   const canvasRef = useRef(null);
-
-  const handleSave = async () => {
-    try {
-      const canvas = await html2canvas(canvasRef.current, { useCORS: true, scale: 2 });
-      onSave({ 
-        id: Date.now(), 
-        image: canvas.toDataURL(`image/${config.format.toLowerCase()}`), 
-        ...config 
-      });
-      alert("Design saved to Gallery!");
-    } catch (error) {
-      console.error("Error saving canvas:", error);
-      alert("Failed to save design. Check console for details.");
-    }
-  };
+const handleSave = async () => {
+  if (!canvasRef.current) return;
+  try {
+    const canvas = await html2canvas(canvasRef.current, {
+      useCORS: true,
+      scale: 2, // High resolution
+      backgroundColor: null, // Captures theme/gradient
+      logging: false,
+      // Forces library to wait for all components to settle
+      onclone: (clonedDoc) => {
+        const clonedCanvas = clonedDoc.querySelector('.preview-canvas-root');
+        if (clonedCanvas) clonedCanvas.style.transform = 'none'; 
+      }
+    });
+    
+    onSave({ 
+      id: Date.now(), 
+      image: canvas.toDataURL(`image/${config.format.toLowerCase()}`), 
+      ...config 
+    });
+    alert("Testimonial saved to gallery!");
+  } catch (error) {
+    console.error("Capture Error:", error);
+  }
+};
 
   return (
     <div className="flex h-screen w-screen bg-slate-100 overflow-hidden">
