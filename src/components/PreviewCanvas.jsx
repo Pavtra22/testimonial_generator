@@ -6,50 +6,60 @@ import { unitToPx } from '../utils/converters';
 export default function PreviewCanvas({ canvasRef, config, template, size, setRating }) {
   const w = unitToPx(size.w, size.unit);
   const h = unitToPx(size.h, size.unit);
+  
   const starRatingRef = useRef(null);
   const reviewRef = useRef(null);
   const profileRef = useRef(null);
 
-  const themes = {
-    classic: "bg-white text-slate-900 border-2 border-slate-200 shadow-xl",
-    dark: "bg-slate-950 text-white shadow-2xl",
-    gradient: "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white shadow-2xl"
+  const themeStyles = {
+    classic: { backgroundColor: '#ffffff', color: '#0f172a', border: '2px solid #e2e8f0' },
+    dark: { backgroundColor: '#020617', color: '#ffffff' },
+    gradient: { background: 'linear-gradient(to bottom right, #4f46e5, #9333ea, #ec4899)', color: '#ffffff' }
   };
+
+  const isCustomBg = template && template.startsWith('data:image');
 
   return (
     <div 
       ref={canvasRef}
-      style={{ width: `${w}px`, height: `${h}px` }}
-      className={`preview-canvas-root relative rounded-3xl overflow-hidden flex flex-col items-center justify-center p-16 transition-all ${themes[template] || themes.gradient}`}
+      className="preview-canvas-root relative rounded-[40px] overflow-hidden flex flex-col items-center justify-center p-16 shadow-2xl transition-all"
+      style={{ 
+        width: `${w}px`, 
+        height: `${h}px`,
+        flexShrink: 0,
+        ...(isCustomBg 
+          ? { backgroundImage: `url(${template})`, backgroundSize: 'cover', backgroundPosition: 'center' } 
+          : (themeStyles[template] || themeStyles.gradient)
+        )
+      }}
     >
-      {/* 1. Styled Stars - Bright Yellow/Gold */}
       <Draggable bounds="parent" nodeRef={starRatingRef}>
-        <div ref={starRatingRef} className="cursor-move z-20 mb-8 filter drop-shadow-lg">
+        <div ref={starRatingRef} className="cursor-move z-30 mb-8 filter drop-shadow-lg">
           <StarRating rating={config.rating} setRating={setRating} />
         </div>
       </Draggable>
 
-      {/* 2. Styled Review - Elegant Serif Font Style */}
       <Draggable bounds="parent" nodeRef={reviewRef}>
-        <p ref={reviewRef} className="cursor-move text-center text-4xl font-serif italic font-semibold leading-snug px-6 z-20 drop-shadow-md">
-          "{config.review}"
-        </p>
+        <div ref={reviewRef} className="cursor-move z-20 w-full max-w-4xl px-8 mb-10">
+          <p className="text-center text-5xl font-serif italic font-semibold leading-tight drop-shadow-md">
+            "{config.review}"
+          </p>
+        </div>
       </Draggable>
 
-      {/* 3. Styled Profile Card - Role and Name Colors */}
       <Draggable bounds="parent" nodeRef={profileRef}>
-        <div ref={profileRef} className="cursor-move flex items-center gap-6 bg-black/20 backdrop-blur-xl p-6 rounded-3xl border border-white/10 z-20 shadow-2xl">
+        <div ref={profileRef} className="cursor-move flex items-center gap-6 bg-white/10 backdrop-blur-2xl p-8 rounded-[32px] border border-white/20 z-20 shadow-2xl">
           <img 
             src={config.image} 
-            className="w-24 h-24 rounded-full border-4 border-white shadow-xl object-cover" 
-            alt="profile" 
+            className="w-28 h-28 rounded-full border-4 border-white shadow-xl object-cover" 
+            alt="profile"
+            crossOrigin="anonymous" 
           />
           <div className="text-left">
-            <p className="font-black text-2xl uppercase tracking-tighter leading-none mb-1">
+            <p className="font-black text-3xl uppercase tracking-tighter leading-none mb-2">
               {config.name}
             </p>
-            {/* Styled Role: Monospace font with distinctive color */}
-            <p className="text-sm font-mono font-bold tracking-widest text-indigo-200 uppercase opacity-90">
+            <p className="text-sm font-mono font-black tracking-[0.2em] text-white/70 uppercase">
               {config.role}
             </p>
           </div>
