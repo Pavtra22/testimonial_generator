@@ -1,67 +1,126 @@
 import React, { useRef } from 'react';
 import Draggable from 'react-draggable';
-import StarRating from './StarRating';
+import StarRating from './StarRating'; // Uses the updated file above
 import { unitToPx } from '../utils/converters';
 
 export default function PreviewCanvas({ canvasRef, config, template, size, setRating }) {
   const w = unitToPx(size.w, size.unit);
   const h = unitToPx(size.h, size.unit);
   
-  const starRatingRef = useRef(null);
-  const reviewRef = useRef(null);
-  const profileRef = useRef(null);
-
-  const themeStyles = {
-    classic: { backgroundColor: '#ffffff', color: '#0f172a', border: '2px solid #e2e8f0' },
-    dark: { backgroundColor: '#020617', color: '#ffffff' },
-    gradient: { background: 'linear-gradient(to bottom right, #4f46e5, #9333ea, #ec4899)', color: '#ffffff' }
+  const cardRef = useRef(null);
+  
+  const styles = config.styles || {
+    review: { font: 'font-serif', color: '#000000', size: 32, maxWidth: 100 },
+    name: { font: 'font-sans', color: '#000000', size: 24 },
+    role: { font: 'font-mono', color: '#64748b', size: 14 }
   };
 
-  const isCustomBg = template && template.startsWith('data:image');
+  const cardConfig = config.card || { show: false, color: 'white', padding: 40, radius: 24 };
+
+  // Center Card Style
+  const containerStyle = cardConfig.show ? {
+    backgroundColor: cardConfig.color,
+    borderRadius: `${cardConfig.radius}px`,
+    padding: `${cardConfig.padding}px`,
+    border: cardConfig.border ? '1px solid rgba(0,0,0,0.1)' : 'none',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
+    maxWidth: '85%',
+    width: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'move',
+    backdropFilter: 'blur(8px)'
+  } : {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
 
   return (
     <div 
       ref={canvasRef}
-      className="preview-canvas-root relative rounded-[40px] overflow-hidden flex flex-col items-center justify-center p-16 shadow-2xl transition-all"
+      className="preview-canvas-root relative overflow-hidden flex items-center justify-center shadow-2xl transition-all" 
       style={{ 
         width: `${w}px`, 
         height: `${h}px`,
         flexShrink: 0,
-        ...(isCustomBg 
-          ? { backgroundImage: `url(${template})`, backgroundSize: 'cover', backgroundPosition: 'center' } 
-          : (themeStyles[template] || themeStyles.gradient)
-        )
+        backgroundColor: '#ffffff',
       }}
     >
-      <Draggable bounds="parent" nodeRef={starRatingRef}>
-        <div ref={starRatingRef} className="cursor-move z-30 mb-8 filter drop-shadow-lg">
-          <StarRating rating={config.rating} setRating={setRating} />
-        </div>
-      </Draggable>
+      {/* Background Layer */}
+      <div 
+        className="background-layer absolute inset-0 -z-0"
+        style={{
+          width: '100%',
+          height: '100%',
+          ...template.style
+        }}
+      />
 
-      <Draggable bounds="parent" nodeRef={reviewRef}>
-        <div ref={reviewRef} className="cursor-move z-20 w-full max-w-4xl px-8 mb-10">
-          <p className="text-center text-5xl font-serif italic font-semibold leading-tight drop-shadow-md">
-            "{config.review}"
-          </p>
-        </div>
-      </Draggable>
+      {/* Draggable Card */}
+      <Draggable bounds="parent" nodeRef={cardRef}>
+        <div 
+          ref={cardRef}
+          className="relative z-10 transition-all duration-300"
+          style={containerStyle}
+        >
+          {/* Rating Component */}
+          <div className="mb-6 hover:scale-105 transition-transform">
+            <StarRating 
+              rating={config.rating} 
+              setRating={setRating}
+              iconType={config.iconType}   // Pass icon type
+              color={config.iconColor}     // Pass icon color
+            />
+          </div>
 
-      <Draggable bounds="parent" nodeRef={profileRef}>
-        <div ref={profileRef} className="cursor-move flex items-center gap-6 bg-white/10 backdrop-blur-2xl p-8 rounded-[32px] border border-white/20 z-20 shadow-2xl">
-          <img 
-            src={config.image} 
-            className="w-28 h-28 rounded-full border-4 border-white shadow-xl object-cover" 
-            alt="profile"
-            crossOrigin="anonymous" 
-          />
-          <div className="text-left">
-            <p className="font-black text-3xl uppercase tracking-tighter leading-none mb-2">
-              {config.name}
+          {/* Review Text */}
+          <div className="w-full flex justify-center mb-8 group">
+            <p 
+              className={`text-center italic font-semibold leading-tight outline-none border-2 border-transparent group-hover:border-blue-400/30 rounded-xl p-2 transition-all ${styles.review.font}`}
+              style={{ 
+                color: styles.review.color, 
+                fontSize: `${styles.review.size}px`,
+                maxWidth: `${styles.review.maxWidth}%`,
+              }}
+            >
+              "{config.review}"
             </p>
-            <p className="text-sm font-mono font-black tracking-[0.2em] text-white/70 uppercase">
-              {config.role}
-            </p>
+          </div>
+
+          {/* Profile Section */}
+          <div className={`flex items-center gap-4 p-3 pr-6 rounded-full border shadow-sm hover:shadow-lg transition-all group ${cardConfig.show ? 'bg-transparent border-transparent' : 'bg-white/20 backdrop-blur-sm border-white/40'}`}>
+            <img 
+              src={config.image} 
+              className="w-16 h-16 rounded-full border-2 border-white shadow-md object-cover" 
+              alt="profile"
+              crossOrigin="anonymous" 
+            />
+            <div className="text-left">
+              <p 
+                className={`font-black uppercase tracking-tight leading-none mb-1 ${styles.name.font}`}
+                style={{ 
+                  color: styles.name.color, 
+                  fontSize: `${styles.name.size}px` 
+                }}
+              >
+                {config.name}
+              </p>
+              <p 
+                className={`font-bold tracking-widest uppercase opacity-80 ${styles.role.font}`}
+                style={{ 
+                  color: styles.role.color, 
+                  fontSize: `${styles.role.size}px` 
+                }}
+              >
+                {config.role}
+              </p>
+            </div>
           </div>
         </div>
       </Draggable>
