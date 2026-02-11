@@ -99,13 +99,14 @@ export default function EditorSidebar({ config, setConfig }) {
         </div>
       </section>
 
-      {/* 3. NEW: Rating Icon Settings */}
+      {/* 3. Rating Icon Settings */}
       <section className="p-6 border-b space-y-4 bg-slate-50/30">
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
           <Star size={14} /> Rating Style
         </h3>
+        
+        {/* Type & Color */}
         <div className="flex gap-2">
-           {/* Icon Selector */}
            <div className="flex bg-white border rounded-lg p-1 gap-1">
              {[
                { id: 'star', icon: Star },
@@ -123,7 +124,6 @@ export default function EditorSidebar({ config, setConfig }) {
              ))}
            </div>
 
-           {/* Icon Color Picker */}
            <div className="relative w-10 h-10 rounded-lg overflow-hidden border shadow-sm">
               <input 
                 type="color" 
@@ -133,9 +133,20 @@ export default function EditorSidebar({ config, setConfig }) {
               />
            </div>
         </div>
+
+        {/* Icon Size */}
+        <div className="flex items-center gap-2">
+           <span className="text-[10px] font-semibold text-slate-400 w-10">Size</span>
+           <input 
+             type="range" min="16" max="64" 
+             value={config.iconSize || 32} 
+             onChange={(e) => setConfig({...config, iconSize: parseInt(e.target.value)})}
+             className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+           />
+        </div>
       </section>
 
-      {/* 4. Card Settings (Center Background) */}
+      {/* 4. Card Settings */}
       <section className="p-6 border-b bg-slate-50/50 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -154,33 +165,23 @@ export default function EditorSidebar({ config, setConfig }) {
 
         {config.card?.show && (
           <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
-            {/* Color & Opacity */}
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-slate-500 uppercase">Color & Opacity</label>
               <div className="flex gap-2 items-center">
                 <input 
                   type="color" 
                   className="w-10 h-10 rounded cursor-pointer border-0" 
-                  onChange={(e) => {
-                     // Simple hex update, keeps opacity at default high for now or needs complex parsing
-                     updateCard('color', e.target.value); 
-                  }}
+                  onChange={(e) => updateCard('color', e.target.value)}
                 />
-                {/* Simplified Opacity control - ideally parses rgba */}
                 <input 
                   type="range" min="0" max="1" step="0.1"
                   defaultValue="0.9"
-                  onChange={(e) => {
-                    // This is a simplified way to just set rgba white with opacity for demo
-                    // Real app would parse the current color hex to rgb first
-                    updateCard('color', `rgba(255, 255, 255, ${e.target.value})`); 
-                  }}
+                  onChange={(e) => updateCard('color', `rgba(255, 255, 255, ${e.target.value})`)}
                   className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
             </div>
 
-            {/* Padding & Radius */}
             <div className="grid grid-cols-2 gap-4">
                <div>
                  <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Padding</label>
@@ -205,7 +206,7 @@ export default function EditorSidebar({ config, setConfig }) {
         )}
       </section>
 
-      {/* 5. Style & Typography */}
+      {/* 5. Typography */}
       <section className="p-6 space-y-8">
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
           <Palette size={14} /> Typography
@@ -246,7 +247,7 @@ export default function EditorSidebar({ config, setConfig }) {
           </div>
         </div>
 
-        {/* Name Controls */}
+        {/* Name Controls - UPDATED with Size & Wrap */}
         <div className="space-y-3 p-4 bg-slate-50 rounded-xl border shadow-sm">
           <label className="text-xs font-bold text-slate-500 uppercase">Name</label>
           <div className="flex gap-2">
@@ -261,7 +262,65 @@ export default function EditorSidebar({ config, setConfig }) {
               <input type="color" className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] cursor-pointer p-0 m-0" value={config.styles?.name?.color} onChange={(e) => updateStyle('name', 'color', e.target.value)} />
             </div>
           </div>
+          {/* Added Size */}
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-[10px] font-semibold text-slate-400 w-10">Size</span>
+            <input 
+              type="range" min="12" max="60" 
+              value={config.styles?.name?.size || 24} 
+              onChange={(e) => updateStyle('name', 'size', parseInt(e.target.value))}
+              className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+          {/* Added Wrap */}
+          <div className="flex items-center gap-2 pt-1">
+             <span className="text-[10px] font-semibold text-slate-400 w-10 flex items-center gap-1"><ArrowLeftRight size={10}/> Wrap</span>
+            <input 
+              type="range" min="30" max="100" 
+              value={config.styles?.name?.maxWidth || 100} 
+              onChange={(e) => updateStyle('name', 'maxWidth', parseInt(e.target.value))}
+              className="flex-1 h-1.5 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
         </div>
+
+        {/* Role Controls - UPDATED with Size & Wrap */}
+        <div className="space-y-3 p-4 bg-slate-50 rounded-xl border shadow-sm">
+          <label className="text-xs font-bold text-slate-500 uppercase">Role</label>
+          <div className="flex gap-2">
+            <select 
+              className="flex-1 p-2 bg-white border rounded-lg text-xs"
+              value={config.styles?.role?.font}
+              onChange={(e) => updateStyle('role', 'font', e.target.value)}
+            >
+              {FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+            </select>
+            <div className="w-9 h-9 rounded-full overflow-hidden border ring-1 ring-slate-200 shadow-sm relative">
+              <input type="color" className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] cursor-pointer p-0 m-0" value={config.styles?.role?.color} onChange={(e) => updateStyle('role', 'color', e.target.value)} />
+            </div>
+          </div>
+          {/* Added Size */}
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-[10px] font-semibold text-slate-400 w-10">Size</span>
+            <input 
+              type="range" min="10" max="40" 
+              value={config.styles?.role?.size || 14} 
+              onChange={(e) => updateStyle('role', 'size', parseInt(e.target.value))}
+              className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+          {/* Added Wrap */}
+          <div className="flex items-center gap-2 pt-1">
+             <span className="text-[10px] font-semibold text-slate-400 w-10 flex items-center gap-1"><ArrowLeftRight size={10}/> Wrap</span>
+            <input 
+              type="range" min="30" max="100" 
+              value={config.styles?.role?.maxWidth || 100} 
+              onChange={(e) => updateStyle('role', 'maxWidth', parseInt(e.target.value))}
+              className="flex-1 h-1.5 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+        </div>
+
       </section>
     </aside>
   );

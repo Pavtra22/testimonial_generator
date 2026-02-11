@@ -1,93 +1,87 @@
 import React from 'react';
-import { Image, Palette, LayoutTemplate } from 'lucide-react';
+import { Image, LayoutGrid, PaintBucket } from 'lucide-react';
 
 export default function TemplateSlider({ currentTemplate, setTemplate }) {
   
   const templates = [
-    // --- 1. FRAMES (Requested: "Plain in centre") ---
+    // --- 1. CUSTOMIZABLE SOLID COLOR ---
     { 
-      id: 'chat_pattern', 
-      label: 'Chat Vibes', 
-      layout: 'frame', 
-      style: { 
-        backgroundImage: 'url("https://img.freepik.com/free-vector/hand-drawn-business-communication-background_23-2147612140.jpg?w=1380&t=st=1707635000~exp=1707635600~hmac=e5e5e5")',
-        backgroundSize: 'cover',
-        backgroundColor: '#e0f2fe'
-      } 
-    },
-    { 
-      id: 'double_outline_frame', 
-      label: 'Double Border', 
-      layout: 'frame',
-      frameStyle: 'double',
-      style: { 
-        backgroundColor: '#f8fafc',
-        backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
-        backgroundSize: '20px 20px',
-      } 
-    },
-    { 
-      id: 'modern_dark_frame', 
-      label: 'Dark Mode', 
-      layout: 'frame',
-      darkFrame: true, // New property for dark inner cards
-      style: { 
-        backgroundImage: 'url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop")',
-        backgroundSize: 'cover',
-      } 
-    },
-    { 
-      id: 'polaroid', 
-      label: 'Polaroid', 
-      layout: 'frame',
-      frameStyle: 'bottom_heavy', // Style for polaroid look
-      style: { 
-        backgroundColor: '#d6d3d1',
-        backgroundImage: 'url("https://www.transparenttextures.com/patterns/cork-board.png")', 
-      } 
+      id: 'solid_custom', 
+      label: 'Solid Color', 
+      isSolid: true, // Triggers color picker logic
+      style: { backgroundColor: '#ffffff' }, 
+      textClass: 'text-slate-900' 
     },
 
-    // --- 2. FULL BACKGROUNDS (Patterns & Gradients) ---
+    // --- 2. SOCIAL MEDIA GRADIENTS ---
     { 
-      id: 'abstract_shapes', 
-      label: 'Geometry', 
-      layout: 'full',
-      style: { 
-        backgroundImage: 'url("https://img.freepik.com/free-vector/gradient-geometric-shapes-background_23-2148429731.jpg")',
-        backgroundSize: 'cover',
-        color: '#fff'
-      } 
+      id: 'instagram', 
+      label: 'Insta', 
+      style: { background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)' }, 
+      textClass: 'text-white' 
     },
     { 
-      id: 'glass_blur', 
-      label: 'Glass', 
-      layout: 'full',
-      style: { 
-        backgroundImage: 'url("https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop")',
-        backgroundSize: 'cover',
-        color: '#fff'
-      } 
+      id: 'linkedin', 
+      label: 'LinkedIn', 
+      style: { background: 'linear-gradient(135deg, #0077b5 0%, #0e679c 100%)' }, 
+      textClass: 'text-white' 
     },
     { 
-      id: 'soft_gradient', 
-      label: 'Soft Aura', 
-      layout: 'full',
-      style: { 
-        background: 'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)',
-        color: '#0f172a'
-      } 
+      id: 'twitter_dark', 
+      label: 'X Dark', 
+      style: { backgroundColor: '#15202b' }, 
+      textClass: 'text-white' 
     },
     { 
-      id: 'blueprint', 
-      label: 'Blueprint', 
-      layout: 'full',
-      style: { 
-        backgroundColor: '#1e293b',
-        backgroundImage: `linear-gradient(#334155 1px, transparent 1px), linear-gradient(to right, #334155 1px, transparent 1px)`,
-        backgroundSize: '40px 40px',
-        color: '#94a3b8'
-      } 
+      id: 'midnight_blue', 
+      label: 'Midnight', 
+      style: { background: 'linear-gradient(to top, #1e3c72 0%, #1e3c72 1%, #2a5298 100%)' }, 
+      textClass: 'text-white' 
     },
+
+    // --- 3. PATTERNS ---
+    { 
+      id: 'polka', 
+      label: 'Polka', 
+      style: { 
+        backgroundColor: '#e5e5f7',
+        backgroundImage: 'radial-gradient(#444cf7 1px, #e5e5f7 1px)',
+        backgroundSize: '20px 20px'
+      }, 
+      textClass: 'text-slate-900' 
+    },
+    { 
+      id: 'grid_paper', 
+      label: 'Grid', 
+      style: { 
+        backgroundColor: '#fff',
+        backgroundImage: 'linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(to right, #e5e7eb 1px, transparent 1px)',
+        backgroundSize: '20px 20px'
+      }, 
+      textClass: 'text-slate-900' 
+    },
+    { 
+      id: 'stripes', 
+      label: 'Stripes', 
+      style: { 
+        backgroundColor: '#f8fafc',
+        backgroundImage: 'repeating-linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%, #e2e8f0), repeating-linear-gradient(45deg, #e2e8f0 25%, #f8fafc 25%, #f8fafc 75%, #e2e8f0 75%, #e2e8f0)',
+        backgroundPosition: '0 0, 10px 10px',
+        backgroundSize: '20px 20px'
+      }, 
+      textClass: 'text-slate-900' 
+    },
+    { 
+      id: 'checkered', 
+      label: 'Checks', 
+      style: { 
+        backgroundColor: '#fff',
+        backgroundImage: 'linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee), linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee)',
+        backgroundPosition: '0 0, 10px 10px',
+        backgroundSize: '20px 20px'
+      }, 
+      textClass: 'text-slate-900' 
+    }
   ];
 
   const handleImageUpload = (e) => {
@@ -95,58 +89,76 @@ export default function TemplateSlider({ currentTemplate, setTemplate }) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setTemplate({ 
+        setTemplate({
           id: 'custom',
-          layout: 'full',
+          label: 'Custom',
           style: { 
             backgroundImage: `url(${reader.result})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
-          }
+          },
+          textClass: 'text-white' 
         });
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleSolidColorChange = (e) => {
+    setTemplate({
+      id: 'solid_custom',
+      label: 'Solid Color',
+      isSolid: true,
+      style: { backgroundColor: e.target.value },
+      textClass: 'text-slate-900'
+    });
+  };
+
   return (
-    <div className="h-52 bg-white border-t p-6 flex flex-col gap-4 shadow-[0_-5px_30px_rgba(0,0,0,0.03)] z-30">
+    <div className="h-52 bg-white border-t p-6 flex flex-col gap-3 shadow-[0_-5px_30px_rgba(0,0,0,0.03)] z-30">
       <div className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest">
-        <LayoutTemplate size={14} /> Template Gallery
+        <LayoutGrid size={14} /> Templates & Patterns
       </div>
       
       <div className="flex items-center gap-4 overflow-x-auto custom-scrollbar pb-4">
-        {/* Upload Button */}
-        <label className="flex-shrink-0 w-28 h-28 border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center text-slate-400 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 cursor-pointer transition-all bg-slate-50 group">
-          <Image size={28} className="group-hover:scale-110 transition-transform"/>
-          <span className="text-[10px] font-bold uppercase mt-2">Upload BG</span>
+        {/* Upload Custom Background */}
+        <label className="flex-shrink-0 w-24 h-24 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 hover:border-blue-500 hover:text-blue-500 cursor-pointer transition-all bg-slate-50">
+          <Image size={24} />
+          <span className="text-[9px] font-bold uppercase mt-1">Upload</span>
           <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
         </label>
 
-        <div className="w-[1px] h-20 bg-slate-200 mx-1"></div>
+        <div className="w-[1px] h-16 bg-slate-200 mx-1"></div>
 
         {/* Templates Loop */}
-        {templates.map((t) => (
+        {templates.map((tmpl) => (
           <button 
-            key={t.id} 
-            onClick={() => setTemplate(t)}
-            className={`flex-shrink-0 w-28 h-28 rounded-2xl border-2 transition-all flex flex-col items-center justify-end p-2 shadow-sm relative overflow-hidden group
-              ${currentTemplate?.id === t.id ? 'border-blue-600 ring-2 ring-blue-100 scale-105' : 'border-slate-100 hover:border-blue-300 hover:scale-105'} 
+            key={tmpl.id} 
+            onClick={() => setTemplate(tmpl)}
+            className={`flex-shrink-0 w-24 h-24 rounded-xl border-2 transition-all flex flex-col items-center justify-end p-2 shadow-sm overflow-hidden relative group
+              ${currentTemplate.id === tmpl.id ? 'border-blue-600 ring-2 ring-blue-100 scale-105' : 'border-slate-200 hover:scale-105'} 
             `}
           >
-            {/* Thumbnail Preview */}
-            <div className="absolute inset-0 z-0" style={t.style}></div>
-            
-            {/* Frame Indicator */}
-            {t.layout === 'frame' && (
-              <div className="absolute inset-4 border-2 border-dashed border-slate-400/50 bg-white/50 z-1 rounded-lg"></div>
-            )}
+            {/* Background Preview */}
+            <div className="absolute inset-0 z-0" style={tmpl.style}></div>
 
-            <div className="relative z-10 w-full">
-              <span className="block w-full text-center text-[10px] font-bold bg-white/90 backdrop-blur-md text-slate-800 px-2 py-1 rounded-lg shadow-sm">
-                {t.label}
-              </span>
-            </div>
+            {/* Color Picker Overlay for Solid Custom */}
+            {tmpl.isSolid && currentTemplate.id === 'solid_custom' && (
+              <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/10 backdrop-blur-[1px]">
+                 <div className="bg-white rounded-full p-1.5 shadow-md">
+                   <PaintBucket size={14} className="text-slate-700"/>
+                 </div>
+                 <input 
+                    type="color" 
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    onChange={handleSolidColorChange}
+                 />
+              </div>
+            )}
+            
+            <span className="relative z-10 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-slate-800 shadow-sm">
+              {tmpl.label}
+            </span>
           </button>
         ))}
       </div>

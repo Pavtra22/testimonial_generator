@@ -11,13 +11,13 @@ export default function Generator() {
     ...dummyTestimonials[0],
     filename: "social-post", 
     format: "PNG",
-    // NEW: Icon Settings
-    iconType: 'star', // Options: 'star', 'heart', 'thumb', 'zap'
-    iconColor: '#facc15', // Default Gold
+    iconType: 'star', 
+    iconColor: '#facc15',
+    iconSize: 32,
     styles: {
       review: { font: 'font-serif', color: '#1e293b', size: 32, maxWidth: 100 }, 
-      name: { font: 'font-sans', color: '#000000', size: 24 },
-      role: { font: 'font-mono', color: '#64748b', size: 14 }
+      name: { font: 'font-sans', color: '#000000', size: 24, maxWidth: 100 }, 
+      role: { font: 'font-mono', color: '#64748b', size: 14, maxWidth: 100 }   
     },
     card: {
       show: true,
@@ -28,16 +28,12 @@ export default function Generator() {
     }
   });
 
+  // Default Template
   const [template, setTemplate] = useState({ 
-    id: 'abstract_shapes', 
-    label: 'Geometry', 
-    layout: 'full', 
-    style: { 
-      backgroundImage: 'url("https://img.freepik.com/free-vector/gradient-geometric-shapes-background_23-2148429731.jpg")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      color: '#fff'
-    } 
+    id: 'ocean_breeze', 
+    label: 'Breeze', 
+    style: { background: 'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)' }, 
+    textClass: 'text-slate-900' 
   });
   
   const [size, setSize] = useState({ w: 1080, h: 1080, unit: 'px', locked: true });
@@ -51,21 +47,22 @@ export default function Generator() {
     setIsDownloading(true);
 
     try {
-      // 1. Force a small wait to ensure images are ready
+      // Slight delay to ensure React has finished rendering any final updates
       await new Promise(resolve => setTimeout(resolve, 200));
 
       const canvas = await html2canvas(element, {
-        useCORS: true,       // CRITICAL: Allows external images (Unsplash/Freepik)
-        allowTaint: false,   // CRITICAL: Must be false to allow export
-        scale: 2,            // High res
-        backgroundColor: '#ffffff', // Fallback color
+        useCORS: true,
+        allowTaint: false,
+        scale: 2, // 2x Scale for sharp text
+        backgroundColor: '#ffffff',
         logging: false,
-        imageTimeout: 15000, // Wait longer for external images
-        // Ensure background images are captured
+        imageTimeout: 15000,
+        // Clone fixes: ensure background layer is visible in the clone
         onclone: (clonedDoc) => {
           const bgLayer = clonedDoc.querySelector('.background-layer');
           if (bgLayer) {
-             bgLayer.style.display = 'block'; // Ensure visibility
+             bgLayer.style.display = 'block'; 
+             bgLayer.style.opacity = '1';
           }
         }
       });
@@ -79,14 +76,14 @@ export default function Generator() {
       document.body.removeChild(link);
     } catch (error) {
       console.error("Capture Error:", error);
-      alert("Capture failed. Try picking a different background or checking your internet connection.");
+      alert("Capture failed.");
     } finally {
       setIsDownloading(false);
     }
   };
 
   return (
-    <div className="flex h-screen w-screen bg-slate-100 overflow-hidden">
+    <div className="flex h-screen w-screen bg-slate-100 overflow-hidden font-sans">
       <div className="w-96 bg-white border-r flex flex-col shadow-xl z-20">
         <div className="p-4 border-b bg-slate-50">
           <h1 className="text-xl font-black text-slate-800 tracking-tighter uppercase text-center">
@@ -96,8 +93,10 @@ export default function Generator() {
         <EditorSidebar config={config} setConfig={setConfig} />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-200/50">
-        <div className="flex-1 flex items-center justify-center p-10 overflow-auto">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-200/50 relative">
+        
+        {/* SCROLLABLE PREVIEW AREA (Reverted from Zoom) */}
+        <div className="flex-1 flex items-center justify-center overflow-auto p-10">
           <PreviewCanvas 
             canvasRef={canvasRef} 
             config={config} 
@@ -106,6 +105,7 @@ export default function Generator() {
             setRating={(r) => setConfig({...config, rating: r})} 
           />
         </div>
+        
         <TemplateSlider currentTemplate={template} setTemplate={setTemplate} />
       </div>
 

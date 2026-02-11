@@ -1,9 +1,8 @@
 import React from 'react';
 import { Star, Heart, ThumbsUp, Zap } from 'lucide-react';
 
-export default function StarRating({ rating, setRating, iconType = 'star', color = '#facc15', editable = true }) {
+export default function StarRating({ rating, setRating, iconType = 'star', color = '#facc15', size = 32, editable = true }) {
   
-  // Map string types to actual Lucide components
   const IconMap = {
     star: Star,
     heart: Heart,
@@ -26,10 +25,8 @@ export default function StarRating({ rating, setRating, iconType = 'star', color
           type="button"
         >
           <IconComponent
-            size={32}
-            // Fill logic: If current index <= rating, fill it.
+            size={size} // Dynamic Size
             fill={index <= rating ? color : "none"}
-            // Stroke color: Always use the selected color
             color={color}
             strokeWidth={2}
           />
