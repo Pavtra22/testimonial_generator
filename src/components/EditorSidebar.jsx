@@ -70,7 +70,29 @@ export default function EditorSidebar({ config, setConfig }) {
         </div>
       </section>
 
-      {/* 2. Content Input */}
+      {/* NEW: 2. Animated Effects Section */}
+      <section className="p-6 border-b bg-white">
+        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <Zap size={14} className="text-blue-600" /> Animated Effects
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {['none', 'confetti', 'hearts', 'glitter', 'stars'].map((effect) => (
+            <button
+              key={effect}
+              onClick={() => setConfig({ ...config, effectType: effect })}
+              className={`p-2 text-[10px] font-bold rounded-lg border capitalize transition-all ${
+                config.effectType === effect 
+                  ? 'bg-blue-600 text-white border-blue-600' 
+                  : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              {effect}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. Content Input */}
       <section className="p-6 border-b space-y-4">
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
           <AlignLeft size={14} /> Content
@@ -99,13 +121,12 @@ export default function EditorSidebar({ config, setConfig }) {
         </div>
       </section>
 
-      {/* 3. Rating Icon Settings */}
+      {/* 4. Rating Icon Settings */}
       <section className="p-6 border-b space-y-4 bg-slate-50/30">
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
           <Star size={14} /> Rating Style
         </h3>
         
-        {/* Type & Color */}
         <div className="flex gap-2">
            <div className="flex bg-white border rounded-lg p-1 gap-1">
              {[
@@ -134,7 +155,6 @@ export default function EditorSidebar({ config, setConfig }) {
            </div>
         </div>
 
-        {/* Icon Size */}
         <div className="flex items-center gap-2">
            <span className="text-[10px] font-semibold text-slate-400 w-10">Size</span>
            <input 
@@ -146,7 +166,7 @@ export default function EditorSidebar({ config, setConfig }) {
         </div>
       </section>
 
-      {/* 4. Card Settings */}
+      {/* 5. Card Settings */}
       <section className="p-6 border-b bg-slate-50/50 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -206,7 +226,7 @@ export default function EditorSidebar({ config, setConfig }) {
         )}
       </section>
 
-      {/* 5. Typography */}
+      {/* 6. Typography */}
       <section className="p-6 space-y-8">
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
           <Palette size={14} /> Typography
@@ -247,7 +267,7 @@ export default function EditorSidebar({ config, setConfig }) {
           </div>
         </div>
 
-        {/* Name Controls - UPDATED with Size & Wrap */}
+        {/* Name Controls */}
         <div className="space-y-3 p-4 bg-slate-50 rounded-xl border shadow-sm">
           <label className="text-xs font-bold text-slate-500 uppercase">Name</label>
           <div className="flex gap-2">
@@ -262,7 +282,6 @@ export default function EditorSidebar({ config, setConfig }) {
               <input type="color" className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] cursor-pointer p-0 m-0" value={config.styles?.name?.color} onChange={(e) => updateStyle('name', 'color', e.target.value)} />
             </div>
           </div>
-          {/* Added Size */}
           <div className="flex items-center gap-2 pt-1">
             <span className="text-[10px] font-semibold text-slate-400 w-10">Size</span>
             <input 
@@ -272,7 +291,6 @@ export default function EditorSidebar({ config, setConfig }) {
               className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
-          {/* Added Wrap */}
           <div className="flex items-center gap-2 pt-1">
              <span className="text-[10px] font-semibold text-slate-400 w-10 flex items-center gap-1"><ArrowLeftRight size={10}/> Wrap</span>
             <input 
@@ -284,7 +302,7 @@ export default function EditorSidebar({ config, setConfig }) {
           </div>
         </div>
 
-        {/* Role Controls - UPDATED with Size & Wrap */}
+        {/* Role Controls */}
         <div className="space-y-3 p-4 bg-slate-50 rounded-xl border shadow-sm">
           <label className="text-xs font-bold text-slate-500 uppercase">Role</label>
           <div className="flex gap-2">
@@ -299,7 +317,6 @@ export default function EditorSidebar({ config, setConfig }) {
               <input type="color" className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] cursor-pointer p-0 m-0" value={config.styles?.role?.color} onChange={(e) => updateStyle('role', 'color', e.target.value)} />
             </div>
           </div>
-          {/* Added Size */}
           <div className="flex items-center gap-2 pt-1">
             <span className="text-[10px] font-semibold text-slate-400 w-10">Size</span>
             <input 
@@ -309,7 +326,6 @@ export default function EditorSidebar({ config, setConfig }) {
               className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
           </div>
-          {/* Added Wrap */}
           <div className="flex items-center gap-2 pt-1">
              <span className="text-[10px] font-semibold text-slate-400 w-10 flex items-center gap-1"><ArrowLeftRight size={10}/> Wrap</span>
             <input 

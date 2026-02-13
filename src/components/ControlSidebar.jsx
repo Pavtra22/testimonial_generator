@@ -11,7 +11,7 @@ const PRESETS = {
   pinterest_pin: { w: 1000, h: 1500, label: "Pinterest Pin (2:3)" }
 };
 
-export default function ControlSidebar({ size, setSize, config, setConfig, onDownload }) {
+export default function ControlSidebar({ size, setSize, config, setConfig, onDownload, isDownloading }) {
   const updateDimension = (dim, value) => {
     const num = parseFloat(value) || 0;
     if (size.locked) {
@@ -38,45 +38,107 @@ export default function ControlSidebar({ size, setSize, config, setConfig, onDow
           <Settings size={14} /> Canvas Settings
         </h3>
         <div className="flex gap-2 mb-4">
-          <select value={size.unit} onChange={(e) => setSize({...size, unit: e.target.value})} className="flex-1 p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none">
+          <select 
+            value={size.unit} 
+            onChange={(e) => setSize({...size, unit: e.target.value})} 
+            className="flex-1 p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none"
+          >
             <option value="px">Pixels (px)</option>
             <option value="in">Inches (in)</option>
             <option value="cm">Centimeters (cm)</option>
           </select>
-          <button onClick={() => setSize({...size, locked: !size.locked})} className={`p-3 rounded-xl border transition-all ${size.locked ? 'bg-blue-600 text-white' : 'text-slate-400'}`}>
+          <button 
+            onClick={() => setSize({...size, locked: !size.locked})} 
+            className={`p-3 rounded-xl border transition-all ${size.locked ? 'bg-blue-600 text-white' : 'text-slate-400'}`}
+          >
             {size.locked ? <Lock size={18} /> : <Unlock size={18} />}
           </button>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <input type="number" value={Math.round(size.w)} onChange={(e) => updateDimension('w', e.target.value)} className="w-full p-2.5 bg-slate-50 border rounded-xl text-sm" />
-          <input type="number" value={Math.round(size.h)} onChange={(e) => updateDimension('h', e.target.value)} disabled={size.locked} className="w-full p-2.5 bg-slate-50 border rounded-xl text-sm" />
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Width</label>
+            <input 
+              type="number" 
+              value={Math.round(size.w)} 
+              onChange={(e) => updateDimension('w', e.target.value)} 
+              className="w-full p-2.5 bg-slate-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" 
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Height</label>
+            <input 
+              type="number" 
+              value={Math.round(size.h)} 
+              onChange={(e) => updateDimension('h', e.target.value)} 
+              disabled={size.locked} 
+              className={`w-full p-2.5 bg-slate-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 ${size.locked ? 'opacity-50 cursor-not-allowed' : ''}`} 
+            />
+          </div>
         </div>
-        <p className="mt-3 text-[10px] text-blue-500 font-mono text-center bg-blue-50 py-1 rounded">Output: {currentPxWidth} × {currentPxHeight} px</p>
+        <p className="mt-3 text-[10px] text-blue-500 font-mono text-center bg-blue-50 py-1 rounded">
+          Output: {currentPxWidth} × {currentPxHeight} px
+        </p>
       </section>
 
       <hr className="border-slate-200" />
 
       <section>
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><Crop size={14} /> Social Presets</h3>
-        <select onChange={handlePreset} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none">
+        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <Crop size={14} /> Social Presets
+        </h3>
+        <select 
+          onChange={handlePreset} 
+          className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none hover:bg-slate-100 transition-colors cursor-pointer"
+        >
           <option value="">Select Platform Size</option>
-          {Object.entries(PRESETS).map(([key, val]) => <option key={key} value={key}>{val.label}</option>)}
+          {Object.entries(PRESETS).map(([key, val]) => (
+            <option key={key} value={key}>{val.label}</option>
+          ))}
         </select>
       </section>
 
       <hr className="border-slate-200" />
 
       <section className="flex-1 space-y-4">
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><FileText size={14} /> Export Options</h3>
-        <input type="text" value={config.filename} onChange={(e) => setConfig({...config, filename: e.target.value})} placeholder="Filename" className="w-full p-3 bg-slate-50 border rounded-xl text-sm outline-none" />
-        <select value={config.format} onChange={(e) => setConfig({...config, format: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none">
-          <option>PNG</option><option>JPEG</option><option>WEBP</option>
-        </select>
+        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+          <FileText size={14} /> Export Options
+        </h3>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Filename</label>
+          <input 
+            type="text" 
+            value={config.filename} 
+            onChange={(e) => setConfig({...config, filename: e.target.value})} 
+            placeholder="Enter filename" 
+            className="w-full p-3 bg-slate-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" 
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Format</label>
+          <select 
+            value={config.format} 
+            onChange={(e) => setConfig({...config, format: e.target.value})} 
+            className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none cursor-pointer"
+          >
+            <option>PNG</option>
+            <option>JPEG</option>
+            <option>WEBP</option>
+            <option>MP4</option>
+          </select>
+        </div>
       </section>
 
-      <button onClick={onDownload} className="mt-auto w-full py-4 bg-green-600 text-white rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl shadow-green-100 hover:bg-green-700 active:scale-95">
+      <button 
+        onClick={onDownload} 
+        disabled={isDownloading}
+        className={`mt-auto w-full py-4 rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl ${
+          isDownloading 
+            ? 'bg-slate-400 cursor-not-allowed' 
+            : 'bg-green-600 hover:bg-green-700 text-white shadow-green-100 active:scale-95'
+        }`}
+      >
         <Download size={20} />
-        <span>DOWNLOAD TESTIMONIAL</span>
+        <span>{isDownloading ? 'RECORDING VIDEO...' : 'DOWNLOAD TESTIMONIAL'}</span>
       </button>
     </aside>
   );

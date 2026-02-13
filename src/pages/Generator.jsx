@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
+import RecordRTC from 'recordrtc';
 import EditorSidebar from '../components/EditorSidebar';
 import PreviewCanvas from '../components/PreviewCanvas';
 import ControlSidebar from '../components/ControlSidebar';
@@ -9,8 +10,9 @@ import { dummyTestimonials } from '../data/testimonials';
 export default function Generator() {
   const [config, setConfig] = useState({ 
     ...dummyTestimonials[0],
-    filename: "social-post", 
+    filename: "testimonial-post", 
     format: "PNG",
+    effectType: 'none',
     iconType: 'star', 
     iconColor: '#facc15',
     iconSize: 32,
@@ -28,7 +30,6 @@ export default function Generator() {
     }
   });
 
-  // Default Template
   const [template, setTemplate] = useState({ 
     id: 'ocean_breeze', 
     label: 'Breeze', 
@@ -46,39 +47,71 @@ export default function Generator() {
 
     setIsDownloading(true);
 
-    try {
-      // Slight delay to ensure React has finished rendering any final updates
-      await new Promise(resolve => setTimeout(resolve, 200));
+    if (config.format === 'MP4') {
+      try {
+        const recordingCanvas = document.createElement('canvas');
+        const scale = 2; 
+        recordingCanvas.width = element.offsetWidth * scale;
+        recordingCanvas.height = element.offsetHeight * scale;
+        const ctx = recordingCanvas.getContext('2d', { alpha: false });
+        
+        const stream = recordingCanvas.captureStream(30); 
+        const recorder = new RecordRTC(stream, {
+          type: 'video',
+          mimeType: 'video/mp4',
+          bitsPerSecond: 12800000,
+          video: { width: recordingCanvas.width, height: recordingCanvas.height }
+        });
 
-      const canvas = await html2canvas(element, {
-        useCORS: true,
-        allowTaint: false,
-        scale: 2, // 2x Scale for sharp text
-        backgroundColor: '#ffffff',
-        logging: false,
-        imageTimeout: 15000,
-        // Clone fixes: ensure background layer is visible in the clone
-        onclone: (clonedDoc) => {
-          const bgLayer = clonedDoc.querySelector('.background-layer');
-          if (bgLayer) {
-             bgLayer.style.display = 'block'; 
-             bgLayer.style.opacity = '1';
+        recorder.startRecording();
+
+        const duration = 7000; // 7 seconds recording
+        const startTime = Date.now();
+
+        const captureFrame = async () => {
+          const elapsed = Date.now() - startTime;
+          
+          if (elapsed < duration) {
+            const tempCanvas = await html2canvas(element, { 
+              scale: scale, 
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#ffffff',
+              logging: false 
+            });
+            ctx.clearRect(0, 0, recordingCanvas.width, recordingCanvas.height);
+            ctx.drawImage(tempCanvas, 0, 0);
+            await new Promise(r => setTimeout(r, 16));
+            requestAnimationFrame(captureFrame);
+          } else {
+            recorder.stopRecording(() => {
+              const blob = recorder.getBlob();
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = `${config.filename || 'testimonial'}.mp4`;
+              link.click();
+              setIsDownloading(false);
+            });
           }
-        }
-      });
+        };
 
-      const image = canvas.toDataURL(`image/${config.format.toLowerCase()}`, 1.0);
-      const link = document.createElement('a');
-      link.download = `${config.filename || 'testimonial'}.${config.format.toLowerCase()}`;
-      link.href = image;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Capture Error:", error);
-      alert("Capture failed.");
-    } finally {
-      setIsDownloading(false);
+        captureFrame();
+      } catch (error) {
+        console.error("Video Capture Error:", error);
+        setIsDownloading(false);
+      }
+    } else {
+      try {
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const link = document.createElement('a');
+        link.download = `${config.filename || 'testimonial'}.${config.format.toLowerCase()}`;
+        link.href = canvas.toDataURL(`image/${config.format.toLowerCase()}`);
+        link.click();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsDownloading(false);
+      }
     }
   };
 
@@ -94,8 +127,6 @@ export default function Generator() {
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 bg-slate-200/50 relative">
-        
-        {/* SCROLLABLE PREVIEW AREA (Reverted from Zoom) */}
         <div className="flex-1 flex items-center justify-center overflow-auto p-10">
           <PreviewCanvas 
             canvasRef={canvasRef} 
@@ -105,17 +136,12 @@ export default function Generator() {
             setRating={(r) => setConfig({...config, rating: r})} 
           />
         </div>
-        
         <TemplateSlider currentTemplate={template} setTemplate={setTemplate} />
       </div>
 
       <ControlSidebar 
-        size={size} 
-        setSize={setSize} 
-        config={config} 
-        setConfig={setConfig} 
-        onDownload={handleDownload}
-        isDownloading={isDownloading} 
+        size={size} setSize={setSize} config={config} setConfig={setConfig} 
+        onDownload={handleDownload} isDownloading={isDownloading} 
       />
     </div>
   );
