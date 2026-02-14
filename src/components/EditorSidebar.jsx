@@ -76,7 +76,7 @@ export default function EditorSidebar({ config, setConfig }) {
           <Zap size={14} className="text-blue-600" /> Animated Effects
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          {['none', 'confetti', 'hearts', 'glitter', 'stars'].map((effect) => (
+          {['none', 'confetti', 'hearts', 'glitter','bubbles', 'rain', 'snow', 'stars'].map((effect) => (
             <button
               key={effect}
               onClick={() => setConfig({ ...config, effectType: effect })}

@@ -50,7 +50,7 @@ export default function Generator() {
     if (config.format === 'MP4') {
       try {
         const recordingCanvas = document.createElement('canvas');
-        const scale = 2; 
+        const scale = 1.5; // Slightly lower scale for faster processing
         recordingCanvas.width = element.offsetWidth * scale;
         recordingCanvas.height = element.offsetHeight * scale;
         const ctx = recordingCanvas.getContext('2d', { alpha: false });
@@ -59,13 +59,11 @@ export default function Generator() {
         const recorder = new RecordRTC(stream, {
           type: 'video',
           mimeType: 'video/mp4',
-          bitsPerSecond: 12800000,
-          video: { width: recordingCanvas.width, height: recordingCanvas.height }
+          bitsPerSecond: 12800000
         });
 
         recorder.startRecording();
-
-        const duration = 7000; // 7 seconds recording
+        const duration = 7000; 
         const startTime = Date.now();
 
         const captureFrame = async () => {
@@ -76,12 +74,15 @@ export default function Generator() {
               scale: scale, 
               useCORS: true,
               allowTaint: true,
-              backgroundColor: '#ffffff',
+              backgroundColor: null, 
               logging: false 
             });
-            ctx.clearRect(0, 0, recordingCanvas.width, recordingCanvas.height);
+
+            // Draw background and then the captured frame
+            ctx.fillStyle = "#ffffff"; 
+            ctx.fillRect(0, 0, recordingCanvas.width, recordingCanvas.height);
             ctx.drawImage(tempCanvas, 0, 0);
-            await new Promise(r => setTimeout(r, 16));
+            
             requestAnimationFrame(captureFrame);
           } else {
             recorder.stopRecording(() => {
@@ -95,7 +96,7 @@ export default function Generator() {
           }
         };
 
-        captureFrame();
+        await captureFrame();
       } catch (error) {
         console.error("Video Capture Error:", error);
         setIsDownloading(false);

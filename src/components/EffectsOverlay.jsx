@@ -1,84 +1,135 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function EffectsOverlay({ type }) {
+  const [time, setTime] = useState(Date.now());
+
+  // Force a re-render every frame to update particle positions
+  useEffect(() => {
+    let frame;
+    const tick = () => {
+      setTime(Date.now());
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   if (!type || type === 'none') return null;
 
-  const particles = Array.from({ length: 30 });
+  const particleCount = 25;
+  const particles = Array.from({ length: particleCount }).map((_, i) => ({
+    id: i,
+    seed: (i + 1) * 137.5, // Unique offset for each particle
+    speed: 0.2 + (i % 5) * 0.1,
+    left: (i * (100 / particleCount) + (i % 3)) % 100,
+  }));
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
-      {/* CONFETTI EFFECT */}
-      {type === 'confetti' && (
-        <div className="absolute inset-0">
-          {particles.map((_, i) => (
+      {particles.map((p) => {
+        // Calculate vertical progress (0 to 1) based on time
+        const duration = 4000 / p.speed;
+        const progress = ((time + p.seed) % duration) / duration;
+        
+        // Effects Logic
+        if (type === 'hearts') {
+          return (
             <div 
-              key={i} 
-              className="absolute w-2 h-2 animate-bounce"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `-20px`,
-                backgroundColor: ['#ff4d4d', '#4db8ff', '#4dff88', '#ffd11a', '#ff4dff'][i % 5],
-                animation: `fall ${2 + Math.random() * 3}s linear infinite`,
-                animationDelay: `${Math.random() * 2}s`,
-                borderRadius: Math.random() > 0.5 ? '50%' : '0%'
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* HEARTS EFFECT */}
-      {type === 'hearts' && (
-        <div className="absolute inset-0">
-          {particles.map((_, i) => (
-            <div 
-              key={i} 
+              key={p.id} 
               className="absolute text-2xl"
               style={{
-                left: `${Math.random() * 100}%`,
-                bottom: `-30px`,
-                animation: `floatUp ${4 + Math.random() * 4}s ease-in infinite`,
-                animationDelay: `${Math.random() * 5}s`,
-                opacity: 0.8
+                left: `${p.left}%`,
+                bottom: `${progress * 110 - 10}%`, // Moves from bottom to top
+                opacity: 1 - progress,
+                transform: `translateX(${Math.sin(progress * 10) * 20}px) scale(${0.5 + progress})`,
               }}
             >
               ❤️
             </div>
-          ))}
-        </div>
-      )}
+          );
+        }
 
-      {/* GLITTER / STARS EFFECT */}
-      {(type === 'glitter' || type === 'stars') && (
-        <div className="absolute inset-0">
-          {particles.map((_, i) => (
+        if (type === 'confetti') {
+          return (
             <div 
-              key={i} 
-              className="absolute bg-white rounded-full animate-ping"
+              key={p.id} 
+              className="absolute w-3 h-3"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${2 + Math.random() * 4}px`,
-                height: `${2 + Math.random() * 4}px`,
-                boxShadow: '0 0 10px 2px rgba(255, 255, 255, 0.8)',
-                animationDuration: `${1 + Math.random() * 2}s`,
-                animationDelay: `${Math.random() * 3}s`
+                left: `${p.left}%`,
+                top: `${progress * 110 - 10}%`, // Moves from top to bottom
+                backgroundColor: ['#ff4d4d', '#4db8ff', '#4dff88', '#ffd11a', '#ff4dff'][p.id % 5],
+                transform: `rotate(${progress * 720}deg)`,
+                borderRadius: p.id % 2 === 0 ? '50%' : '0%'
               }}
             />
-          ))}
-        </div>
-      )}
+          );
+        }
 
-      <style>{`
-        @keyframes fall {
-          to { transform: translateY(110vh) rotate(720deg); }
+        if (type === 'bubbles') {
+          return (
+            <div 
+              key={p.id} 
+              className="absolute rounded-full border border-white/40 bg-white/10 backdrop-blur-[1px]"
+              style={{
+                left: `${p.left}%`,
+                bottom: `${progress * 110 - 10}%`,
+                width: `${20 + (p.id % 4) * 10}px`,
+                height: `${20 + (p.id % 4) * 10}px`,
+                opacity: 0.6 - (progress * 0.5),
+              }}
+            />
+          );
         }
-        @keyframes floatUp {
-          0% { transform: translateY(0) scale(0.5); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translateY(-110vh) translateX(${Math.random() * 100 - 50}px) scale(1.2); opacity: 0; }
+
+        if (type === 'rain') {
+          return (
+            <div 
+              key={p.id} 
+              className="absolute bg-blue-400/40 w-[2px] h-6"
+              style={{
+                left: `${p.left}%`,
+                top: `${((progress * 2) % 1) * 110 - 10}%`,
+                transform: `rotate(15deg)`,
+              }}
+            />
+          );
         }
-      `}</style>
+
+        if (type === 'snow') {
+          return (
+            <div 
+              key={p.id} 
+              className="absolute bg-white rounded-full opacity-80"
+              style={{
+                left: `${p.left}%`,
+                top: `${progress * 110 - 10}%`,
+                width: `${5 + (p.id % 5)}px`,
+                height: `${5 + (p.id % 5)}px`,
+                filter: 'blur(1px)',
+              }}
+            />
+          );
+        }
+
+        if (type === 'glitter' || type === 'stars') {
+            const sparkle = Math.sin(time / 200 + p.seed) > 0;
+            return (
+              <div 
+                key={p.id} 
+                className={`absolute bg-white rounded-full transition-opacity duration-300 ${sparkle ? 'opacity-100' : 'opacity-20'}`}
+                style={{
+                  left: `${p.left}%`,
+                  top: `${(p.seed % 100)}%`,
+                  width: '4px',
+                  height: '4px',
+                  boxShadow: '0 0 8px 2px white',
+                }}
+              />
+            );
+          }
+
+        return null;
+      })}
     </div>
   );
 }
