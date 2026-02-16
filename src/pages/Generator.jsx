@@ -12,6 +12,7 @@ export default function Generator() {
     ...dummyTestimonials[0],
     filename: "testimonial-post", 
     format: "PNG",
+    gifUrl:'',
     effectType: 'none',
     iconType: 'star', 
     iconColor: '#facc15',
@@ -71,9 +72,9 @@ export default function Generator() {
           
           if (elapsed < duration) {
             const tempCanvas = await html2canvas(element, { 
-              scale: scale, 
+              scale:scale, 
               useCORS: true,
-              allowTaint: true,
+              allowTaint: false,
               backgroundColor: null, 
               logging: false 
             });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { dummyTestimonials } from '../data/testimonials';
-import { User, AlignLeft, Palette, ArrowLeftRight, Layout, Star, Heart, Zap, ThumbsUp } from 'lucide-react';
+import { User, AlignLeft, Palette, ArrowLeftRight, Layout, Star, Heart, Zap, ThumbsUp, Image} from 'lucide-react';
 
 const FONTS = [
   { label: 'Modern Sans', value: 'font-sans' },
@@ -91,6 +91,26 @@ export default function EditorSidebar({ config, setConfig }) {
           ))}
         </div>
       </section>
+      <section className="p-6 border-b bg-white">
+        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+    <Image size={14} /> Add GIF
+  </h3>
+  <input 
+    type="text" 
+    placeholder="Paste Giphy/Tenor link..."
+    className="w-full p-3 bg-slate-50 border rounded-xl text-sm outline-none mb-2 focus:ring-2 focus:ring-blue-500"
+    value={config.gifUrl || ''}
+    onChange={(e) => setConfig({ ...config, gifUrl: e.target.value })}
+  />
+  {config.gifUrl && (
+    <button 
+      onClick={() => setConfig({ ...config, gifUrl:'' })}
+      className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+    >
+      Remove GIF
+    </button>
+  )}
+</section>
 
       {/* 3. Content Input */}
       <section className="p-6 border-b space-y-4">

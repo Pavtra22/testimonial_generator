@@ -58,6 +58,19 @@ export default function PreviewCanvas({ canvasRef, config, template, size, setRa
       {/* 3. Draggable Content (Top) */}
       <Draggable bounds="parent" nodeRef={cardRef}>
         <div ref={cardRef} className="relative transition-all duration-300 cursor-move" style={containerStyle}>
+          
+          {/* Conditional GIF Rendering - Crucial for MP4 export */}
+          {config.gifUrl && (
+            <div className="mb-4">
+              <img 
+                src={config.gifUrl} 
+                alt="testimonial-gif" 
+                className="max-w-[200px] rounded-lg shadow-md"
+                crossOrigin="anonymous" 
+              />
+            </div>
+          )}
+
           <div className="mb-6">
             <StarRating 
               rating={config.rating} 
