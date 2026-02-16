@@ -51,7 +51,7 @@ export default function Generator() {
     if (config.format === 'MP4') {
       try {
         const recordingCanvas = document.createElement('canvas');
-        const scale = 1.5; // Slightly lower scale for faster processing
+        const scale = 1; // Slightly lower scale for faster processing
         recordingCanvas.width = element.offsetWidth * scale;
         recordingCanvas.height = element.offsetHeight * scale;
         const ctx = recordingCanvas.getContext('2d', { alpha: false });
@@ -72,11 +72,12 @@ export default function Generator() {
           
           if (elapsed < duration) {
             const tempCanvas = await html2canvas(element, { 
-              scale:scale, 
+              scale:scale,
               useCORS: true,
               allowTaint: false,
               backgroundColor: null, 
-              logging: false 
+              logging: false,
+              removeContainer: true
             });
 
             // Draw background and then the captured frame

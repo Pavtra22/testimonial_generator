@@ -1,6 +1,6 @@
 import React from 'react';
-import { dummyTestimonials } from '../data/testimonials';
-import { User, AlignLeft, Palette, ArrowLeftRight, Layout, Star, Heart, Zap, ThumbsUp, Image} from 'lucide-react';
+import { dummyTestimonials,defaultGifs } from '../data/testimonials';
+import { User, AlignLeft, Palette, ArrowLeftRight, Layout, Star, Heart, Zap, ThumbsUp, Image, X } from 'lucide-react';
 
 const FONTS = [
   { label: 'Modern Sans', value: 'font-sans' },
@@ -108,6 +108,33 @@ export default function EditorSidebar({ config, setConfig }) {
       className="text-[10px] text-red-500 font-bold uppercase hover:underline"
     >
       Remove GIF
+    </button>
+  )}
+</section>
+<section className="p-6 border-b bg-white">
+  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+    <Image size={14} /> Sticker Library
+  </h3>
+  <div className="grid grid-cols-5 gap-2 mb-4">
+    {defaultGifs.map((gif) => (
+      <button
+        key={gif.id}
+        onClick={() => setConfig({ ...config, gifUrl: gif.url })}
+        className={`relative aspect-square rounded-lg border-2 overflow-hidden transition-all ${
+          config.gifUrl === gif.url ? 'border-blue-600' : 'border-slate-100 hover:border-slate-300'
+        }`}
+      >
+        <img src={gif.url} className="w-full h-full object-cover" alt={gif.label} />
+      </button>
+    ))}
+  </div>
+  
+  {config.gifUrl && (
+    <button 
+      onClick={() => setConfig({ ...config, gifUrl: null })}
+      className="flex items-center gap-1 text-[10px] text-red-500 font-bold uppercase"
+    >
+      <X size={12} /> Remove Sticker
     </button>
   )}
 </section>

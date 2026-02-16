@@ -69,8 +69,19 @@ export default function PreviewCanvas({ canvasRef, config, template, size, setRa
                 crossOrigin="anonymous" 
               />
             </div>
+            
           )}
-
+        {config.gifUrl && (
+  <div className="mb-4 pointer-events-none relative z-50">
+    <img 
+      key={config.gifUrl} // Forces fresh render cycle for frame capture
+      src={config.gifUrl} 
+      alt="sticker" 
+      className="max-w-[150px] rounded-lg shadow-md"
+      // DO NOT use crossOrigin for local asset imports
+    />
+  </div>
+)}
           <div className="mb-6">
             <StarRating 
               rating={config.rating} 
